@@ -1,0 +1,21 @@
+.bloc-card{
+    width: 300px;
+    img{
+        width: 300px;
+    }
+    .title{
+        max-width: 100%;
+        font-weight: 600;
+        margin-top: 25px;
+        font-size: 20px;
+        line-height: 25px;
+    }
+    .description{
+        margin-top: 25px;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 20px;
+        border-bottom: 1px solid rgba(200,200,200,0.8);
+        margin-bottom: 50px;
+    }
+}

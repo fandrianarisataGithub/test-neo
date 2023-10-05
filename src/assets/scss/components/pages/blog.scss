@@ -1,0 +1,17 @@
+.page-blog{
+    h1{
+        text-decoration: underline;
+        text-transform: uppercase;
+    }
+    .blog-container{
+        margin-top: 50px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 20px; 
+        justify-items: center; 
+        &:nth-child(n+4) {
+            grid-column: span 3; 
+            justify-self: center; 
+        }
+    }
+}

@@ -34,6 +34,15 @@
                             Blog
                         </router-link>
 					</li>
+                    <li class="nav-item">
+						<router-link 
+                            to="/admin"
+                            class="nav-link" 
+                            aria-current="page"
+                        >
+                            Admin
+                        </router-link>
+					</li>
 				</ul>
                 <form class="d-flex" role="search">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
