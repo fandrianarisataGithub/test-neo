@@ -1,0 +1,16 @@
+.page-home{
+    .holidays-container{
+        margin-top: 50px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 20px; 
+        justify-items: center; 
+        margin-bottom: 50px;
+        /*.bloc-holiday{
+            &:nth-child(n+4) {
+                grid-column: span 3; 
+                justify-self: center; 
+            }
+        }*/
+    }
+}

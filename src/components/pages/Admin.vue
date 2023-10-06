@@ -1,218 +1,106 @@
-<template>
+<template lang="">
 	<div class="page-admin base-global-main-section">
-		<h1 class="mb-4">Todo List avec Vue 3 et Bootstrap</h1>
-		<button class="btn btn-success mb-3" @click="openAddModal">
-			Ajouter une tâche
-		</button>
-
-		<!-- Modal d'ajout/édition -->
-		<div
-			class="my-modal"
-			ref="taskModal"
-			tabindex="-1"
-			aria-labelledby="taskModalLabel"
-			aria-hidden="true"
-		>
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="taskModalLabel">
-							{{ modalTitle }}
-						</h5>
-						<button
-							type="button"
-							class="btn-close"
-							data-bs-dismiss="modal"
-							aria-label="Close"
-						></button>
-					</div>
-					<div class="modal-body">
-						<form @submit.prevent="saveTask">
-							<div class="mb-3">
-								<label for="title" class="form-label"
-									>Titre</label
-								>
-								<input
-									type="text"
-									class="form-control"
-									id="title"
-									v-model="task.title"
-									required
-								/>
-							</div>
-							<div class="mb-3">
-								<label for="slug" class="form-label"
-									>Slug</label
-								>
-								<input
-									type="text"
-									class="form-control"
-									id="slug"
-									v-model="task.slug"
-									required
-								/>
-							</div>
-							<div class="mb-3">
-								<label for="content" class="form-label"
-									>Contenu</label
-								>
-								<textarea
-									class="form-control"
-									id="content"
-									v-model="task.content"
-									required
-								></textarea>
-							</div>
-							<div class="mb-3">
-								<label for="date" class="form-label"
-									>Date</label
-								>
-								<input
-									type="date"
-									class="form-control"
-									id="date"
-									v-model="task.date"
-									required
-								/>
-							</div>
-							<button type="submit" class="btn btn-primary">
-								{{ modalAction }}
+		<h1>Admin list of holidays</h1>
+		<div class="table-container">
+			<button class="btn btn-primary btn-sm mb-3" data-bs-target="#modal_demo" data-bs-toggle="modal">Add holiday</button>
+            <div class="total mb-3">Total : {{ $store.getters.total }}</div>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Localname</th>
+						<th>Type</th>
+						<th>Date</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(h, i) in holidays" :key="i">
+						<td>{{ h.name }}</td>
+						<td>{{ h.localName }}</td>
+						<td>{{ h.type }}</td>
+						<td>{{ h.date }}</td>
+						<td>
+							<button class="btn btn-sm btn-warning">Edit</button>
+							<button class="btn btn-sm btn-danger">
+								Delete
 							</button>
-						</form>
-					</div>
-				</div>
-			</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+            <div ref="modal_demo" class="modal" id="modal_demo">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add holiday</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="">
+                                <div class="form-group">
+                                    <label for="">Name</label>
+                                    <input v-model="holiday.name" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Local name</label>
+                                    <input v-model="holiday.localName"  type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Type</label>
+                                    <select v-model="holiday.type"  class="form-control">
+                                        <option value="Public">Public</option>
+                                        <option value="Optional">Optional</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Date</label>
+                                    <input v-model="holiday.date"  type="date" class="form-control">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button ref="btnCloseModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button @click="addHoliday" type="button" class="btn btn-primary">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 		</div>
-
-		<table class="table table-striped table-bordered">
-			<thead>
-				<tr>
-					<th>ID</th>
-					<th>Titre</th>
-					<th>Slug</th>
-					<th>Contenu</th>
-					<th>Date</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="task in tasks" :key="task.id">
-					<td>{{ task.id }}</td>
-					<td>{{ task.title }}</td>
-					<td>{{ task.slug }}</td>
-					<td>{{ task.content }}</td>
-					<td>{{ task.date }}</td>
-					<td>
-						<button
-							class="btn btn-primary btn-sm"
-							@click="editTask(task.id)"
-						>
-							Edit
-						</button>
-						<button
-							class="btn btn-info btn-sm"
-							@click="showTask(task.id)"
-						>
-							Show
-						</button>
-						<button
-							class="btn btn-danger btn-sm"
-							@click="deleteTask(task.id)"
-						>
-							Delete
-						</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
 	</div>
 </template>
-
 <script>
-import { ref } from "vue";
-
+import 'bootstrap'
 export default {
 	data() {
 		return {
-			tasks: [
-				{
-					id: "1",
-					title: "Titre 1",
-					slug: "slug1",
-					content: "Lorem ipsum...",
-					date: "2023-09-12",
-				},
-			],
-			task: {
-				id: "",
-				title: "",
-				slug: "",
-				content: "",
-				date: "",
-			},
-			modalTitle: "",
-			modalAction: "Insert",
-            isShowModal: false
+			holidays: [],
+            modal_demo : null,
+            holiday : {
+                name : '',
+                localName : '',
+                type : null,
+                date : null
+            }
 		};
 	},
-   
-	methods: {
-		editTask(id) {
-			console.log(`Édition de la tâche avec l'ID ${id}`);
-		},
-		showTask(id) {
-			console.log(`Affichage de la tâche avec l'ID ${id}`);
-		},
-		deleteTask(id) {
-			console.log(`Suppression de la tâche avec l'ID ${id}`);
-			const index = this.tasks.findIndex((task) => task.id === id);
-			if (index !== -1) {
-				this.tasks.splice(index, 1);
-			}
-		},
-		addTask() {
-			const newTask = {
-				id: String(this.tasks.length + 1),
-				title: "Nouvelle Tâche",
-				slug: "slug" + (this.tasks.length + 1),
-				content: "Nouveau contenu...",
-				date: "2023-09-13",
-			};
-			this.tasks.push(newTask);
-		},
-		openAddModal() {
-			this.modalTitle = "Ajouter une tâche";
-			this.modalAction = "Ajouter";
-			this.task = {
-				id: String(this.tasks.length + 1),
-				title: "",
-				slug: "",
-				content: "",
-				date: "",
-			};
-            //console.log(this.$refs.taskModal)
-		},
-		openEditModal(id) {
-			const taskToEdit = this.tasks.find((task) => task.id === id);
-			if (taskToEdit) {
-				this.modalTitle = "Éditer la tâche";
-				this.modalAction = "Éditer";
-				this.task = { ...taskToEdit };
-				
-			}
-		},
-		saveTask() {
-			if (this.modalAction === "Ajouter") {
-				this.tasks.push(this.task);
-			} else if (this.modalAction === "Éditer") {
-				const index = this.tasks.findIndex(
-					(task) => task.id === this.task.id
-				);
-				if (index !== -1) {
-					this.tasks[index] = { ...this.task };
-				}
-			}
-		},
+	components: {},
+	async mounted() {
+        //this.modal_demo = new bootstrap.Modal('#modal_demo', {})
+		await this.$store.dispatch("getHolidays");
+		this.holidays = this.$store.getters.holidays;
+		console.log(this.holidays);
 	},
+    methods:{
+        addHoliday(){
+		    this.holidays.push(this.holiday); 
+            // on n'a pas de bdd donc je l'insert dans le store
+            // mais les données via le api n'est pas modifiées
+            this.$store.dispatch('setHolidaysAfterAdding', []); 
+            //close modal 
+            this.$refs.btnCloseModal.click();
+        }
+    }
 };
 </script>
+<style lang=""></style>
