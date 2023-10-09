@@ -40,7 +40,7 @@
                             class="nav-link" 
                             aria-current="page"
                         >
-                            Admin
+                            Admin (to do list)
                         </router-link>
 					</li>
 				</ul>

@@ -145,10 +145,7 @@ export default {
             this.holiday.date = null;
         },
         deleteHoliday(index){
-            let confirm = confirm('Voulez-vous vraiment supprimer cette ligne ?');
-            if(confirm){
-                this.holidays.splice(index, 1);
-            }
+            this.holidays.splice(index, 1);
         }
     }
 };
