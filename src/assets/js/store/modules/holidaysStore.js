@@ -13,29 +13,34 @@ const holidaysStore = {
         total : (state) => state.holidays.length
     },
     actions : {
-        async getHolidays({commit}){
+        async getHolidays({commit, state}){
             try {
-                const apiUrl = 'https://date.nager.at/api/v2/publicholidays/2020/US';
-                const response = await fetch(
-                    apiUrl,
-                    {
-                        method : 'GET',
-                        headers : {
-                            "Content-Type": "application/json"
+                if(state.holidays.length == 0){
+                    const apiUrl = 'https://date.nager.at/api/v2/publicholidays/2020/US';
+                    const response = await fetch(
+                        apiUrl,
+                        {
+                            method : 'GET',
+                            headers : {
+                                "Content-Type": "application/json"
+                            }
                         }
+                    );
+                    if(!response.ok){
+                        throw new Error("Failed to fetch friends");
                     }
-                );
-                if(!response.ok){
-                    throw new Error("Failed to fetch friends");
+                    const result = await response.json();
+                    commit('setHolidays', result);
+                }else{
+                    return state.holidays;
                 }
-                const result = await response.json();
-                commit('setHolidays', result);
                 
             } catch (error) {
-                console.error('pb fetch holidays');
+                console.error(error);
             }
         },
         setHolidaysAfterAdding({commit}, payload){
+            console.log(payload);
             commit('setHolidays', payload);
         }
     }

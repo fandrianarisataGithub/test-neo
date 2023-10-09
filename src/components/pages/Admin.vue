@@ -2,7 +2,7 @@
 	<div class="page-admin base-global-main-section">
 		<h1>Admin list of holidays</h1>
 		<div class="table-container">
-			<button class="btn btn-primary btn-sm mb-3" data-bs-target="#modal_demo" data-bs-toggle="modal">Add holiday</button>
+			<button ref="btnOpenModal" class="btn btn-primary btn-sm mb-3" data-bs-target="#modal_demo" data-bs-toggle="modal">Add holiday</button>
             <div class="total mb-3">Total : {{ $store.getters.total }}</div>
 			<table class="table">
 				<thead>
@@ -21,8 +21,14 @@
 						<td>{{ h.type }}</td>
 						<td>{{ h.date }}</td>
 						<td>
-							<button class="btn btn-sm btn-warning">Edit</button>
-							<button class="btn btn-sm btn-danger">
+							<button 
+                                @click="edit($event, i)" 
+                                class="btn btn-sm btn-warning"
+                            >Edit</button>
+							<button
+                                @click="deleteHoliday(i)"
+                                class="btn btn-sm btn-danger"
+                            >
 								Delete
 							</button>
 						</td>
@@ -61,7 +67,9 @@
                         </div>
                         <div class="modal-footer">
                             <button ref="btnCloseModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button @click="addHoliday" type="button" class="btn btn-primary">Add</button>
+                            <button @click="addHoliday" type="button" class="btn btn-primary">
+                                {{ action == "add" ? 'Add' : 'Save' }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -76,6 +84,8 @@ export default {
 		return {
 			holidays: [],
             modal_demo : null,
+            action : 'add',
+            indexHolidays : null,
             holiday : {
                 name : '',
                 localName : '',
@@ -89,16 +99,56 @@ export default {
         //this.modal_demo = new bootstrap.Modal('#modal_demo', {})
 		await this.$store.dispatch("getHolidays");
 		this.holidays = this.$store.getters.holidays;
-		console.log(this.holidays);
+		//console.log(this.holidays);
 	},
     methods:{
-        addHoliday(){
-		    this.holidays.push(this.holiday); 
-            // on n'a pas de bdd donc je l'insert dans le store
-            // mais les données via le api n'est pas modifiées
-            this.$store.dispatch('setHolidaysAfterAdding', []); 
-            //close modal 
-            this.$refs.btnCloseModal.click();
+        async addHoliday(){
+		    if(this.action == 'add'){
+                let newHoliday = Object.assign({}, this.holiday);
+                this.holidays.push(newHoliday); 
+                // on n'a pas de bdd donc je l'insert dans le store
+                // mais les données via le api n'est pas modifiées
+                this.$store.dispatch('setHolidaysAfterAdding', this.holidays); 
+                //close modal 
+                this.$refs.btnCloseModal.click();
+                // re-affiche les holidays :
+                await this.$store.dispatch("getHolidays");
+		        this.holidays = this.$store.getters.holidays;
+                this.toEmptyHoliday();
+                
+            }else{
+                let editedHoliday = Object.assign({}, this.holiday);
+                this.holidays[this.indexHolidays] = editedHoliday;
+                // on fait l'enregistrement de l'entité ici si il y a de back
+                this.$store.dispatch('setHolidaysAfterAdding', this.holidays);
+                // on ferme le modal
+                this.$refs.btnCloseModal.click();
+                // re-affiche les holidays :
+                await this.$store.dispatch("getHolidays");
+		        this.holidays = this.$store.getters.holidays;
+                //on vide this.holiday
+                this.toEmptyHoliday();
+                
+            }
+        },
+        edit(event, index){
+            this.action = 'edit';
+            //console.log(this.holidays[index])
+            this.holiday = this.holidays[index];
+            this.$refs.btnOpenModal.click();
+            this.indexHolidays = index;
+        },
+        toEmptyHoliday(){
+            this.holiday.name = '';
+            this.holiday.localName = '';
+            this.holiday.type = 'Public';
+            this.holiday.date = null;
+        },
+        deleteHoliday(index){
+            let confirm = confirm('Voulez-vous vraiment supprimer cette ligne ?');
+            if(confirm){
+                this.holidays.splice(index, 1);
+            }
         }
     }
 };
